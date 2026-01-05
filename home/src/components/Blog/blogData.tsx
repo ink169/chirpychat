@@ -6,7 +6,7 @@ const blogData: Blog[] = [
     title: "Best UI components for modern websites",
     paragraph:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet dictum neque, laoreet dolor.",
-    image: "/images/blog/blog-01.jpg",
+    image: "/images/blog/avatars-one.png",
     author: {
       name: "Samuyl Joshi",
       image: "/images/blog/author-03.png",
@@ -20,7 +20,7 @@ const blogData: Blog[] = [
     title: "9 simple ways to improve your design skills",
     paragraph:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet dictum neque, laoreet dolor.",
-    image: "/images/blog/blog-02.jpg",
+    image: "/images/blog/avatars-two.png",
     author: {
       name: "Musharof Chy",
       image: "/images/blog/author-02.png",
@@ -34,7 +34,7 @@ const blogData: Blog[] = [
     title: "Tips to quickly improve your coding speed.",
     paragraph:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet dictum neque, laoreet dolor.",
-    image: "/images/blog/blog-03.jpg",
+    image: "/images/blog/avatars-three.png",
     author: {
       name: "Lethium Deo",
       image: "/images/blog/author-03.png",
