@@ -1,5 +1,5 @@
-import SharePost from "@/components/Blog/SharePost";
-import TagButton from "@/components/Blog/TagButton";
+import SharePost from "@/components/Services/SharePost";
+import TagButton from "@/components/Services/TagButton";
 import Image from "next/image";
 
 import { Metadata } from "next";

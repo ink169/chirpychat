@@ -1,8 +1,8 @@
 import SectionTitle from "../Common/SectionTitle";
-import SingleBlog from "./SingleBlog";
-import blogData from "./blogData";
+import servicesData from "./servicesData";
+import SingleServices from "./SingleServices";
 
-const Blog = () => {
+const Services = () => {
   return (
     <section
       id="blog"
@@ -10,15 +10,15 @@ const Blog = () => {
     >
       <div className="container">
         <SectionTitle
-          title="Our Latest Blogs"
-          paragraph="There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form."
+          title="ChirpyChat Services"
+          paragraph="Promotional Videos, Avatars, Digital Twins through to custom solutions and agentic applications."
           center
         />
 
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 md:gap-x-6 lg:gap-x-8 xl:grid-cols-3">
-          {blogData.map((blog) => (
-            <div key={blog.id} className="w-full">
-              <SingleBlog blog={blog} />
+          {servicesData.map((services) => (
+            <div key={services.id} className="w-full">
+              <SingleServices services={services} />
             </div>
           ))}
         </div>
@@ -27,4 +27,4 @@ const Blog = () => {
   );
 };
 
-export default Blog;
+export default Services;
