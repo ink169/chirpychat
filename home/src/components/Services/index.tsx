@@ -5,7 +5,7 @@ import SingleServices from "./SingleServices";
 const Services = () => {
   return (
     <section
-      id="blog"
+      id="services"
       className="bg-gray-light dark:bg-bg-color-dark py-16 md:py-20 lg:py-28"
     >
       <div className="container">

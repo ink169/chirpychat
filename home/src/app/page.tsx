@@ -13,7 +13,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "ChirpyChat.com - Companionship Solutions for the New Era",
-  description: "This is Home for ChirtyChat.com",
+  description: "This is Home for ChirpyChat.com",
   // other metadata
 };
 
