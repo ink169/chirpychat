@@ -1,0 +1,137 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user profile in the AuthBase application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The user's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The user's last name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "profileImageUrl": {
+          "type": "string",
+          "description": "URL of the user's profile image.",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "InterestRegistration": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "InterestRegistration",
+      "type": "object",
+      "description": "Represents a user's registration of interest.",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "description": "The user's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The user's last name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "language": {
+          "type": "string",
+          "description": "The user's preferred language.",
+          "enum": ["english", "spanish", "french", "german", "other"]
+        },
+        "description": {
+          "type": "string",
+          "description": "A short description of the user's interest."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the interest was registered.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "firstName",
+        "lastName",
+        "email",
+        "language",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}/profile",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile information. The userId path parameter ensures that each user can only access their own profile.  Path-based ownership enables Authorization Independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user.  Corresponds to the Firebase Auth UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/interestRegistrations/{registrationId}",
+        "definition": {
+          "entityName": "InterestRegistration",
+          "schema": {
+            "$ref": "#/backend/entities/InterestRegistration"
+          },
+          "description": "Stores user interest registrations. Publicly writable.",
+          "params": [
+            {
+              "name": "registrationId",
+              "description": "The unique identifier for the interest registration."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This design prioritizes user profile management with a structure that supports secure authentication and profile data storage. It leverages path-based ownership for user profiles, ensuring that only the authenticated user can access and modify their own profile data. This structure is highly secure and makes ownership-based security rules simple and efficient, which satisfies the 'User Authentication' and 'Profile Management' core app features. The database-centric approach aligns with 'Session Handling'.\n\nAuthorization Independence: Path-based ownership inherently provides authorization independence since access control is determined by the path itself (`/users/{userId}/profile`) and the authenticated user ID. No `get()` calls are needed to determine ownership.\n\nQAPs: The structure enables secure list operations (QAPs) because profiles are stored in a dedicated path per user (`/users/{userId}/profile`), preventing unauthorized access to other user's profiles. List operation would be done under a `userId` which is tied to a user's authentication token, further securing data access."
+  }
+}
