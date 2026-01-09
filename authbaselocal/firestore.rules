@@ -1,0 +1,126 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model. All user-specific
+ * data is stored in a private data tree accessible only to the authenticated user who owns it.
+ * This ensures strong data isolation and privacy by default.
+ *
+ * Data Structure: All data is organized hierarchically under a top-level `users`
+ * collection. Each user's data, including their profile, is nested under a document
+ * identified by their unique user ID (UID), for example: `/users/{userId}/profile/{profileId}`.
+ *
+ * Key Security Decisions:
+ * - User Isolation: The core security principle is that a user can only ever access data
+ *   within their own document tree (`/users/{their_own_uid}/...`).
+ * - No User Listing: Listing all documents in the top-level `/users` collection is explicitly
+ *   disallowed to prevent leaking user information.
+ * - Self-Creation: An authenticated user is permitted to create their own root user document
+ *   and their own profile document, establishing their presence in the database.
+ * - Default Deny: All operations are denied by default and must be explicitly granted
+ *   by a rule.
+ *
+ * Denormalization for Authorization: The security model is built on path-based ownership.
+ * The user's UID is part of the document path (e.g., `/users/{userId}`), which allows for
+ * extremely fast and cost-effective security checks without needing to read other documents.
+ * For relational integrity, the UserProfile document itself must contain an `id` field that
+ * matches the `{userId}` from the path, ensuring data cannot be mis-attributed on creation.
+ *
+ * Structural Segregation: This pattern is not required for this schema, as all data
+ * is private user data. There are no public or shared collections defined.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ------------------------------------------------------------------------
+    // Helper Functions
+    // ------------------------------------------------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Validates if the currently signed-in user's UID matches the requested document's
+     * owner ID, which is derived from the path.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Ensures an operation is performed by the document owner and that the document
+     * already exists. Crucial for safe updates and deletes.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    // ------------------------------------------------------------------------
+    // Validation Helper Functions (Prototyping Mode)
+    // - These functions only validate fields critical for authorization
+    //   and relational integrity, not the entire data shape.
+    // ------------------------------------------------------------------------
+
+    /**
+     * On create, ensures the new profile document contains an 'id' field that
+     * matches the parent user's ID from the path. This creates an unbreakable
+     * link between the data and its owner.
+     */
+    function userProfileHasCorrectOwnerOnCreate(userId) {
+      return request.resource.data.id == userId;
+    }
+
+    /**
+     * On update, ensures the 'id' field linking the profile to its owner
+     * cannot be changed. This prevents re-assigning the profile to another user.
+     */
+    function userProfileOwnerIsImmutable() {
+      return request.resource.data.id == resource.data.id;
+    }
+
+    /**
+     * @description Rules for the root user document.
+     * @path /users/{userId}
+     * @allow A user (uid: 'user123') can (create) their own document at `/users/user123`.
+     * @deny An anonymous user cannot (get) any user document.
+     * @deny A user (uid: 'user123') cannot (list) documents in the `/users` collection.
+     * @principle Establishes a user's private data root and prevents enumeration of all users.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // CRITICAL: Prevents any user from listing all user documents.
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for a user's private profile documents.
+     * @path /users/{userId}/profile/{profileId}
+     * @allow A user (uid: 'user123') can (create) a new profile at `/users/user123/profile/main`.
+     * @deny A different user (uid: 'user456') cannot (update) a profile at `/users/user123/profile/main`.
+     * @principle Restricts all access to a user's own data subtree and validates relational integrity.
+     */
+    match /users/{userId}/profile/{profileId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && userProfileHasCorrectOwnerOnCreate(userId);
+      allow update: if isExistingOwner(userId) && userProfileOwnerIsImmutable();
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for interest registrations.
+     * @path /interestRegistrations/{registrationId}
+     * @allow Anyone can submit (create) an interest registration.
+     * @deny Reading, updating, or deleting registrations is denied for this prototype.
+     * @principle Allows public write access for the form, but locks down data for privacy.
+     */
+    match /interestRegistrations/{registrationId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+  }
+}
