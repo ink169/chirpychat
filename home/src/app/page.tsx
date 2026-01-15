@@ -10,6 +10,7 @@ import Pricing from "@/components/Pricing";
 import Testimonials from "@/components/Testimonials";
 import Video from "@/components/Video";
 import { Metadata } from "next";
+import Api from "@/components/Api";
 
 export const metadata: Metadata = {
   title: "ChirpyChat.com - Companionship Solutions for the New Era",
@@ -24,7 +25,7 @@ export default function Home() {
       <Hero />
       <Features />     
       <Services />     
-
+      < Api /> 
       {/* <Video /> */}
       {/* <Brands /> */}
       {/* <AboutSectionOne /> */}
