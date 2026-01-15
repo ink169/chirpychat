@@ -31,15 +31,6 @@ app.get("/heygen/ping", (req, res) => {
 
 app.post("/heygen-live-avatar/create-token", async (req, res) => {
 
-    // get variables from header
-
-    const api_key = req.headers.api_key;
-    const avatar_id = req.headers.avatar_id;    
-    const mode = req.headers.mode; 
-    const voice_id = req.headers.voice_id;  
-    const context_id = req.headers.context_id;  
-    const language_code = req.headers.language_code;          
-
     var server = 'https://api.liveavatar.com/v1/sessions/token'
 
     // create json body for heygen call
@@ -67,21 +58,12 @@ app.post("/heygen-live-avatar/create-token", async (req, res) => {
     
     const vals = await response.json();
 
-    var session_id = vals.data.session_id;
-    var session_token = vals.data.session_token;
-    var message = vals.message;
-
     // create json return object
     var retval = {
         "session_id": vals.data.session_id,     
         "session_token": vals.data.session_token,
-        "message": message       
+        "message": vals.message       
     };
-
-    //var  ret_str = `RESULT: session_id=${session_id}; session_token=${session_token}; message=${message}; `;
-    // var  ret_str = `session_id=${session_id}; session_token=${session_token}; message=${message}; `;
-
-    // res.json({ result: ret_str });
 
     res.json({ retval });
     

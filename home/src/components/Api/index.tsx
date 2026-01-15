@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useRef } from "react";
 
 const Api = () => {
@@ -11,6 +12,8 @@ const Api = () => {
 
   const session_id_ref = useRef<HTMLInputElement>(null);
   const session_token_ref = useRef<HTMLTextAreaElement>(null);
+
+  const [show, setShow] = React.useState(false);
 
   const api_key_input = () => {
     if (api_key_ref.current) {
@@ -76,10 +79,14 @@ async function createHeyGenToken() {
       console.log("session_token", vals.retval.session_token);
       console.log("message", vals.retval.message);      
 
+       session_id_ref.current.value = vals.retval.session_id;
+       session_token_ref.current.value = vals.retval.session_token;
 
       const session_id = vals.retval.session_id;
       const session_token = vals.retval.session_token;
       const message = vals.retval.message;
+
+      setShow(true);
       
       // console.log("Session ID:", session_id);
       // console.log("Session Token:", session_token);
@@ -183,7 +190,7 @@ async function createHeyGenToken() {
                     </button>
                   </div>
                   {/* Session Details */}
-                  <div className="container hidden" id="session_details">                   
+                  <div className={ `${show ? 'block' : 'hidden'} container` }>                   
                     <div className="w-full px-4 md:w-1/2">
                       <div className="mb-8">
                         <label
